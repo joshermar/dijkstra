@@ -18,6 +18,7 @@ class NodeQueue:
             self.queue.append(new_node)
             return
 
+        # TODO: This is inefficient! Use bisection search to find index.
         for i, n in enumerate(self.queue):
             if node_attrs[new_node]['cost'] <= node_attrs[n]['cost']:
                 self.queue.insert(i, new_node)
