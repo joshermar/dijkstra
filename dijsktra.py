@@ -1,15 +1,12 @@
 class NodeQueue:
     def __init__(self, node_attrs=None):
-        ''' The logic behind node_attrs=None is that new instances should not necessarily
-        be required to immediately provide node information. This may change.'''
-
         self.queue = []
 
         if node_attrs:
             for node in node_attrs.keys():
-                self._append_new(node, node_attrs)
+                self._insert_node(node, node_attrs)
 
-    def _append_new(self, new_node, node_attrs):
+    def _insert_node(self, new_node, node_attrs):
         if self.empty():
             self.queue.append(new_node)
             return
@@ -18,15 +15,19 @@ class NodeQueue:
             self.queue.append(new_node)
             return
 
-        # TODO: This is inefficient! Use bisection search to find index.
+        # TODO: This is inefficient! Each insert takes up to O(n) time
+        # Use something like bisection search to find index O(log n).
         for i, n in enumerate(self.queue):
+
             if node_attrs[new_node]['cost'] <= node_attrs[n]['cost']:
                 self.queue.insert(i, new_node)
                 return
 
+        self.queue.append(new_node)
+
     def update_priority(self, node, node_attrs):
         self.queue.remove(node)
-        self._append_new(node, node_attrs)
+        self._insert_node(node, node_attrs)
 
     def pop(self):
         return self.queue.pop(0)
@@ -45,7 +46,7 @@ def _get_path(node_attrs, start, current, path=[]):
         return _get_path(node_attrs, start, previous, path)
 
 
-def find_shortest_path(graph, start, end):
+def find_shortest_path(graph, start, end=None):
     node_attrs = {node: {'cost': float('inf'), 'through': None} for node in graph.keys()}
     node_attrs[start] = {'cost': 0, 'through': start}
 
@@ -76,10 +77,18 @@ def find_shortest_path(graph, start, end):
                 node_attrs[neighbor]['through'] = current_node
                 queue.update_priority(neighbor, node_attrs)
 
-    print(f'Unable to find a path from {start} to {end}!')  # You should never see this with a proper graph
+    if end:  # None is an acceptable argument for end, meaning "full traversal"
+        print(f'Unable to find a path from {start} to {end}!')  # You should never see this with a proper graph
+
+    else:
+        print(f'All best paths from {start}:')
+        sorted_nodes = sorted([(node, node_attrs[node]) for node in node_attrs.keys()], key=lambda n: n[1]['cost'])
+        for n in sorted_nodes:
+            print(f'{n[0]}: {n[1]["cost"]} through {n[1]["through"]}')
 
 
-# This example graph comes from Computerphile's YouTube Video on Dijksta's Algorithm.
+# My take on an adjacency list. This specific graph comes from
+# Computerphile's YouTube Video on Dijksta's Algorithm.
 example_graph = {
     'S': {'A': 7, 'B': 2, 'C': 3},
     'A': {'S': 7, 'B': 3, 'D': 4},
@@ -96,5 +105,4 @@ example_graph = {
     'E': {'G': 2, 'K': 5}
 }
 
-
-find_shortest_path(example_graph, 'S', 'E')
+find_shortest_path(example_graph, 'S')
