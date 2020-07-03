@@ -1,6 +1,4 @@
-# Dijkstra's algorithm in Python
-
-My version of Dijkstra's algorithm
+# My implementation of Dijkstra's algorithm in Python
 
 I was first introduced to this algorithm through routing protocols (OSPF). The algorithm also happens to be what powers navigation in our phones, as it simply finds the shotest path between any two connected nodes, such as your house and the nearest brewery.
 
